@@ -16,7 +16,7 @@ Get a random cat fact! 3 to choose from!
 
 ## Deploy Docker Image ##
 
-`mvn clean -U package`
+`mvn clean -U package docker:build`
 
 Set environment variable DOCKER_HOST=tcp://hostname:2375 to run against a remote Docker host.
 
