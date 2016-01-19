@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: cat-facts
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true
