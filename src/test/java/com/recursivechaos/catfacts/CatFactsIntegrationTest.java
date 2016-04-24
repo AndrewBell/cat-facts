@@ -41,6 +41,7 @@ public class CatFactsIntegrationTest {
         assertEquals("Did not return an OK response", HttpStatus.OK, response.getStatusCode());
         assertNotNull("Did not get a fact", response.getBody().getFact());
         assertNotNull("Did not get an id", response.getBody().getId());
+        assertNotNull("Did not return location header", response.getHeaders().getLocation());
     }
 
     @Test

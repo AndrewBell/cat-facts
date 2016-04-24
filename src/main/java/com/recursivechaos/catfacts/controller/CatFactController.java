@@ -40,7 +40,9 @@ public class CatFactController {
         logger.debug("Total facts found: {}", totalFacts);
         long random = randFactNo(totalFacts);
         logger.debug("Getting random fact no:  {}", random);
-        return new ResponseEntity<>(catFactRepository.findOne(random), HttpStatus.OK);
+        CatFact catFact = catFactRepository.findOne(random);
+        HttpHeaders headers = createHeaders(catFact);
+        return new ResponseEntity<>(catFact, headers, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/catfacts", method = RequestMethod.POST)
@@ -49,9 +51,15 @@ public class CatFactController {
         catFact.setModerated(false);
         catFact = catFactRepository.save(catFact);
         logger.debug("Saved catfact: {}", catFact);
+        HttpHeaders headers = createHeaders(catFact);
+        return new ResponseEntity<>(MODERATION_MESSAGE, headers, HttpStatus.CREATED);
+    }
+
+    private HttpHeaders createHeaders(CatFact catFact) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(catFact.getId()).toUri());
-        return new ResponseEntity<>(MODERATION_MESSAGE, httpHeaders, HttpStatus.CREATED);
+        // TODO: Extract external URI, or figure out how to assume
+        httpHeaders.setLocation(ServletUriComponentsBuilder.fromUriString("http://localhost:8080/catfacts").path("/{id}").buildAndExpand(catFact.getId()).toUri());
+        return httpHeaders;
     }
 
     public static long randFactNo(long max) {

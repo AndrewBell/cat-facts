@@ -7,6 +7,7 @@
 
 package com.recursivechaos.catfacts.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,9 +24,8 @@ public class CatFact {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
     private String fact;
-
+    @JsonIgnore
     private boolean moderated;
 
     // Consider hiding moderated field once not manually creating data
