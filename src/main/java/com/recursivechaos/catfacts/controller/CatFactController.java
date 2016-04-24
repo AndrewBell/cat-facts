@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -35,12 +36,10 @@ public class CatFactController {
 
     @RequestMapping("/catfacts/random")
     public ResponseEntity<CatFact> getRandomCatFact() {
-        // Todo: Cache this
-        long totalFacts = catFactRepository.count();
-        logger.debug("Total facts found: {}", totalFacts);
-        long random = randFactNo(totalFacts);
-        logger.debug("Getting random fact no:  {}", random);
-        CatFact catFact = catFactRepository.findOne(random);
+        // Todo: Performance concerns. Need to query a single random fact from DB instead of pulling whole list
+        List<CatFact> moderatedFacts = catFactRepository.findByModeratedTrue();
+        CatFact catFact = getRandomFact(moderatedFacts);
+        logger.debug("Getting random cat fact:  {}", catFact);
         HttpHeaders headers = createHeaders(catFact);
         return new ResponseEntity<>(catFact, headers, HttpStatus.OK);
     }
@@ -62,7 +61,8 @@ public class CatFactController {
         return httpHeaders;
     }
 
-    public static long randFactNo(long max) {
-        return ThreadLocalRandom.current().nextInt(1, (int) (max + 1));
+    private static CatFact getRandomFact(List<CatFact> facts) {
+        int rand = ThreadLocalRandom.current().nextInt(0, facts.size());
+        return facts.get(rand);
     }
 }

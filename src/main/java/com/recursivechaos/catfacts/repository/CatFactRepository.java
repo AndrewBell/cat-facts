@@ -11,8 +11,12 @@ import com.recursivechaos.catfacts.domain.CatFact;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 // TODO: Use a real data source via properties :)
 @Service
 public interface CatFactRepository extends PagingAndSortingRepository<CatFact, Long> {
+
+    List<CatFact> findByModeratedTrue();
 
 }

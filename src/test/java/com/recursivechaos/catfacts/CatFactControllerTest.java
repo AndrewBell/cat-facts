@@ -22,14 +22,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
 public class CatFactControllerTest {
 
     private static final Logger logger = getLogger(CatFactControllerTest.class);
@@ -47,18 +51,20 @@ public class CatFactControllerTest {
 
     @Test
     public void testGetRandom() throws Exception {
-        CatFact mockCatFact = new CatFact("A cat is a large rodent", true);
-        when(catFactRepository.count()).thenReturn(1L);
-        when(catFactRepository.findOne(1L)).thenReturn(mockCatFact);
+        CatFact mockCatFact1 = new CatFact("A cat is a large rodent", true);
+        CatFact mockCatFact2 = new CatFact("A cat is fat", false);
+        List<CatFact> catFactList = new ArrayList<>();
+        catFactList.add(mockCatFact1);
+        catFactList.add(mockCatFact2);
+        when(catFactRepository.findByModeratedTrue()).thenReturn(catFactList);
 
         ResponseEntity<CatFact> catFactResponse = catFactController.getRandomCatFact();
         logger.info("Test body received: " + catFactResponse);
         CatFact catFact = catFactResponse.getBody();
 
-        verify(catFactRepository).findOne(1L);
-        verify(catFactRepository).count();
+        verify(catFactRepository).findByModeratedTrue();
         assertEquals(HttpStatus.OK, catFactResponse.getStatusCode());
-        assertEquals("Did not get correct cat fact", mockCatFact.getFact(), catFact.getFact());
+        assertNotNull("Did not get cat fact", catFact.getFact());
         assertEquals("Did not get location header", "/catfacts/" + catFact.getId(), catFactResponse.getHeaders().getLocation().getPath());
     }
 
