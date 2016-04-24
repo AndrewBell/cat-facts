@@ -19,9 +19,9 @@ public class TestDataConfig {
     @Bean
     public CommandLineRunner start(CatFactRepository repository) {
         return (args) -> {
-            repository.save(new CatFact("Cat's are jerks."));
-            repository.save(new CatFact("Cat's only know how to kill."));
-            repository.save(new CatFact("A cat will eat you. I read it on the internet once."));
+            repository.save(new CatFact("Cat's are jerks.", true));
+            repository.save(new CatFact("Cat's only know how to kill.", true));
+            repository.save(new CatFact("A cat will eat you. I read it on the internet once.", true));
         };
     }
 

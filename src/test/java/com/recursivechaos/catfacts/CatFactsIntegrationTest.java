@@ -7,6 +7,7 @@
 
 package com.recursivechaos.catfacts;
 
+import com.recursivechaos.catfacts.controller.CatFactController;
 import com.recursivechaos.catfacts.domain.CatFact;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -15,9 +16,12 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Category(IntegrationTest.class)
@@ -32,9 +36,19 @@ public class CatFactsIntegrationTest {
 
     @Test
     public void testGetRandomFact() throws Exception {
-        CatFact response = this.restTemplate.getForObject("/catfacts/random", CatFact.class);
+        ResponseEntity<CatFact> response = this.restTemplate.getForEntity("/catfacts/random", CatFact.class);
         logger.info("Received response: {}", response);
-        assertThat(response.getFact()).isNotEmpty();
-        assertThat(response.getId()).isNotNull();
+        assertEquals("Did not return an OK response", HttpStatus.OK, response.getStatusCode());
+        assertNotNull("Did not get a fact", response.getBody().getFact());
+        assertNotNull("Did not get an id", response.getBody().getId());
+    }
+
+    @Test
+    public void testPostNew() throws Exception {
+        CatFact catFact = new CatFact("Cat's are certifiably evil");
+        ResponseEntity<String> response = this.restTemplate.postForEntity("/catfacts", catFact, String.class);
+        assertEquals("Did not return an OK response", HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull("Did not return location header", response.getHeaders().getLocation());
+        assertEquals("Did not return moderation message", CatFactController.MODERATION_MESSAGE, response.getBody());
     }
 }
