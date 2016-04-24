@@ -26,7 +26,7 @@ public class CatFactController {
     @Autowired
     CatFactRepository catFactRepository;
 
-    @RequestMapping("/catFact")
+    @RequestMapping("/catfacts/random")
     public CatFact getRandomCatFact() {
         // Todo: Cache this
         long totalFacts = catFactRepository.count();

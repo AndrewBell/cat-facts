@@ -13,23 +13,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(CatFactsApplication.class)
-@WebIntegrationTest("server.port=9001")
-public class CatFactIntegrationTests {
+@SpringBootTest
+public class CatFactControllerTest {
 
-    private static final Logger logger = getLogger(CatFactIntegrationTests.class);
-
-    @Value("${server.port}")
-    String port;
+    private static final Logger logger = getLogger(CatFactControllerTest.class);
 
     @Autowired
     CatFactController catFactController;
