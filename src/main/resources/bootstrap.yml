@@ -1,7 +1,9 @@
 spring:
-  application:
-    name: cat-facts
-  cloud:
-    consul:
-      discovery:
-        prefer-ip-address: true
+ application:
+   name: cat-facts
+ cloud:
+   consul:
+     host: 192.168.99.100
+     port: 8500
+     discovery:
+       prefer-ip-address: true
