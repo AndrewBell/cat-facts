@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @RestController
+@RequestMapping("/catfacts")
 public class CatFactController {
 
     private static final Logger logger = getLogger(CatFactController.class);
@@ -34,7 +35,7 @@ public class CatFactController {
     @Autowired
     CatFactRepository catFactRepository;
 
-    @RequestMapping("/catfacts/random")
+    @RequestMapping("/random")
     public ResponseEntity<CatFact> getRandomCatFact() {
         // Todo: Performance concerns. Need to query a single random fact from DB instead of pulling whole list
         List<CatFact> moderatedFacts = catFactRepository.findByModeratedTrue();
@@ -44,7 +45,7 @@ public class CatFactController {
         return new ResponseEntity<>(catFact, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/catfacts", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> createCatFact(@RequestBody CatFact catFact) {
         logger.debug("Received POST request: {}", catFact);
         catFact.setModerated(false);
