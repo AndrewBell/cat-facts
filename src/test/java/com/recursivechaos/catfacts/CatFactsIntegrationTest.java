@@ -48,7 +48,7 @@ public class CatFactsIntegrationTest {
     public void testPostNew() throws Exception {
         CatFact catFact = new CatFact("Cat's are certifiably evil");
         ResponseEntity<String> response = this.restTemplate.postForEntity("/catfacts", catFact, String.class);
-        assertEquals("Did not return an OK response", HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("Did not return an OK response", HttpStatus.ACCEPTED, response.getStatusCode());
         assertNotNull("Did not return location header", response.getHeaders().getLocation());
         assertEquals("Did not return moderation message", CatFactController.MODERATION_MESSAGE, response.getBody());
     }

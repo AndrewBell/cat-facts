@@ -51,7 +51,7 @@ public class CatFactController {
         catFact = catFactRepository.save(catFact);
         logger.debug("Saved catfact: {}", catFact);
         HttpHeaders headers = createHeaders(catFact);
-        return new ResponseEntity<>(MODERATION_MESSAGE, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(MODERATION_MESSAGE, headers, HttpStatus.ACCEPTED);
     }
 
     private HttpHeaders createHeaders(CatFact catFact) {

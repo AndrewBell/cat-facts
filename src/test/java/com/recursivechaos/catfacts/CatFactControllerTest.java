@@ -80,7 +80,7 @@ public class CatFactControllerTest {
 
         verify(catFactRepository).save(any(CatFact.class));
         assertEquals("Did not create correct location header", "/catfacts/1", response.getHeaders().getLocation().getPath());
-        assertEquals("Did not return created status", HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("Did not return created status", HttpStatus.ACCEPTED, response.getStatusCode());
         assertEquals("Did not attach moderation message", CatFactController.MODERATION_MESSAGE, response.getBody());
     }
 }
