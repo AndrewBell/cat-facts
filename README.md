@@ -22,7 +22,7 @@ To run both unit and integration tests
 
 Get a random cat fact! 3 to choose from! 
 
-`curl localhost:8080/catfact/random`
+`curl localhost:8080/catfacts/random`
 
 ## Create Docker Image ##
 
