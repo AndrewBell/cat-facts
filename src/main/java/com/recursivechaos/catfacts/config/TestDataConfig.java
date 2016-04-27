@@ -22,6 +22,7 @@ public class TestDataConfig {
             repository.save(new CatFact("Cat's are jerks.", true));
             repository.save(new CatFact("Cat's only know how to kill.", true));
             repository.save(new CatFact("A cat will eat you. I read it on the internet once.", true));
+            repository.save(new CatFact("Cats are nihilists.", false));
         };
     }
 

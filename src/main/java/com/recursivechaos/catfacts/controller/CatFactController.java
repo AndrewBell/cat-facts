@@ -14,12 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -53,6 +52,19 @@ public class CatFactController {
         logger.debug("Saved catfact: {}", catFact);
         HttpHeaders headers = createHeaders(catFact);
         return new ResponseEntity<>(MODERATION_MESSAGE, headers, HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping("/{id}")
+    public ResponseEntity<CatFact> getCatFact(@PathVariable("id") Long id, HttpServletRequest request) {
+        CatFact catFact = catFactRepository.findOne(id);
+        if (null == catFact) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!catFact.isModerated() && (null == request.getUserPrincipal() || !request.isUserInRole("ROLE_ADMIN"))) {
+            throw new BadCredentialsException("CatFact is awaiting moderation.");
+        } else {
+            return new ResponseEntity<>(catFact, HttpStatus.OK);
+        }
     }
 
     private HttpHeaders createHeaders(CatFact catFact) {

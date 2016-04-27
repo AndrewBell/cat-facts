@@ -11,6 +11,7 @@ import com.recursivechaos.catfacts.controller.CatFactController;
 import com.recursivechaos.catfacts.domain.CatFact;
 import com.recursivechaos.catfacts.repository.CatFactRepository;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,6 +21,8 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
@@ -63,7 +66,7 @@ public class CatFactControllerTest {
         CatFact catFact = catFactResponse.getBody();
 
         verify(catFactRepository).findByModeratedTrue();
-        assertEquals(HttpStatus.OK, catFactResponse.getStatusCode());
+        assertEquals("Did not return 200 OK", HttpStatus.OK, catFactResponse.getStatusCode());
         assertNotNull("Did not get cat fact", catFact.getFact());
         assertEquals("Did not get location header", "/catfacts/" + catFact.getId(), catFactResponse.getHeaders().getLocation().getPath());
     }
@@ -80,7 +83,60 @@ public class CatFactControllerTest {
 
         verify(catFactRepository).save(any(CatFact.class));
         assertEquals("Did not create correct location header", "/catfacts/1", response.getHeaders().getLocation().getPath());
-        assertEquals("Did not return created status", HttpStatus.ACCEPTED, response.getStatusCode());
+        assertEquals("Did not return 202 ACCEPTED", HttpStatus.ACCEPTED, response.getStatusCode());
         assertEquals("Did not attach moderation message", CatFactController.MODERATION_MESSAGE, response.getBody());
     }
+
+    @Test
+    public void testGetNotFound() throws Exception {
+        when(catFactRepository.findOne(1L)).thenReturn(null);
+
+        ResponseEntity<CatFact> response = catFactController.getCatFact(1L, new MockHttpServletRequest());
+
+        verify(catFactRepository).findOne(1L);
+        assertEquals("Did not return 404 NOT FOUND", HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void testGetUnauthorizedModerated() throws Exception {
+        String fact = "Cats don't care";
+        CatFact mockCatFact = new CatFact(fact, true);
+
+        when(catFactRepository.findOne(1L)).thenReturn(mockCatFact);
+
+        ResponseEntity<CatFact> response = catFactController.getCatFact(1L, new MockHttpServletRequest());
+
+        verify(catFactRepository).findOne(1L);
+        assertEquals("Did not return 200 OK", HttpStatus.OK, response.getStatusCode());
+        assertEquals("Did not return correct cat fact", mockCatFact.getFact(), response.getBody().getFact());
+    }
+
+    @Test(expected = BadCredentialsException.class)
+    public void testGetUnauthorizedUnmoderated() throws Exception {
+        String fact = "Cats don't care";
+        CatFact mockCatFact = new CatFact(fact, false);
+
+        when(catFactRepository.findOne(1L)).thenReturn(mockCatFact);
+
+        catFactController.getCatFact(1L, new MockHttpServletRequest());
+    }
+
+    // TODO: Need to mock principal, but unsure of how.
+    @Test
+    @Ignore
+    public void testGetAuthorizedUnmoderated() throws Exception {
+        String fact = "Cats don't care";
+        CatFact mockCatFact = new CatFact(fact, false);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addUserRole("USER_ADMIN");
+
+        when(catFactRepository.findOne(1L)).thenReturn(mockCatFact);
+
+        ResponseEntity<CatFact> response = catFactController.getCatFact(1L, request);
+
+        verify(catFactRepository).findOne(1L);
+        assertEquals("Did not return 200 OK", HttpStatus.OK, response.getStatusCode());
+        assertEquals("Did not return correct cat fact", mockCatFact.getFact(), response.getBody().getFact());
+    }
+
 }
