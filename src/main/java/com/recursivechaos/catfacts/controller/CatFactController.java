@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +30,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CatFactController {
 
     private static final Logger logger = getLogger(CatFactController.class);
-    public static final String MODERATION_MESSAGE = "Your cat fact has been submitted and is waiting moderation. Please check back later using the value from the location header.";
 
     @Autowired
     CatFactRepository catFactRepository;
+
+    public static final String MODERATION_MESSAGE = "Your cat fact has been submitted and is waiting moderation. Please check back later using the value from the location header.";
 
     @RequestMapping("/random")
     public ResponseEntity<CatFact> getRandomCatFact() {
@@ -51,7 +51,7 @@ public class CatFactController {
         logger.debug("Received POST request: {}", catFact);
         catFact.setModerated(false);
         catFact = catFactRepository.save(catFact);
-        logger.debug("Saved catfact: {}", catFact);
+        logger.debug("Saved cat fact: {}", catFact);
         HttpHeaders headers = createHeaders(catFact);
         return new ResponseEntity<>(MODERATION_MESSAGE, headers, HttpStatus.ACCEPTED);
     }
@@ -63,7 +63,7 @@ public class CatFactController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         if (!catFact.isModerated() && (null == request.getUserPrincipal() || !request.isUserInRole("ROLE_ADMIN"))) {
-            throw new BadCredentialsException("CatFact is awaiting moderation.");
+            throw new BadCredentialsException("cat fact is awaiting moderation.");
         } else {
             return new ResponseEntity<>(catFact, HttpStatus.OK);
         }
@@ -72,18 +72,7 @@ public class CatFactController {
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping("/unmoderated")
     public ResponseEntity<List<CatFact>> getUnmoderatedFacts() {
-        return new ResponseEntity(catFactRepository.findByModeratedFalse(), HttpStatus.OK);
-    }
-
-    @RequestMapping
-    public ResponseEntity<List<CatFact>> getAll() {
-        Iterable<CatFact> catFacts = getFilteredList();
-        return new ResponseEntity(catFacts, HttpStatus.OK);
-    }
-
-    @PostFilter("hasPermission(catFacts, 'ADMIN') or hasPermission(catFacts.moderated==true, 'NONE')")
-    private Iterable<CatFact> getFilteredList() {
-        return catFactRepository.findAll();
+        return new ResponseEntity<>(catFactRepository.findByModeratedFalse(), HttpStatus.OK);
     }
 
     private HttpHeaders createHeaders(CatFact catFact) {
