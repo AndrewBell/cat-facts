@@ -19,4 +19,5 @@ public interface CatFactRepository extends PagingAndSortingRepository<CatFact, L
 
     List<CatFact> findByModeratedTrue();
 
+    List<CatFact> findByModeratedFalse();
 }

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -65,6 +67,23 @@ public class CatFactController {
         } else {
             return new ResponseEntity<>(catFact, HttpStatus.OK);
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping("/unmoderated")
+    public ResponseEntity<List<CatFact>> getUnmoderatedFacts() {
+        return new ResponseEntity(catFactRepository.findByModeratedFalse(), HttpStatus.OK);
+    }
+
+    @RequestMapping
+    public ResponseEntity<List<CatFact>> getAll() {
+        Iterable<CatFact> catFacts = getFilteredList();
+        return new ResponseEntity(catFacts, HttpStatus.OK);
+    }
+
+    @PostFilter("hasPermission(catFacts, 'ADMIN') or hasPermission(catFacts.moderated==true, 'NONE')")
+    private Iterable<CatFact> getFilteredList() {
+        return catFactRepository.findAll();
     }
 
     private HttpHeaders createHeaders(CatFact catFact) {
