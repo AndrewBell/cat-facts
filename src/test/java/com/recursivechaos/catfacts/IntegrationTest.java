@@ -7,8 +7,9 @@
 
 package com.recursivechaos.catfacts;
 
-// Used to separate integration and unit tests
-// https://www.javacodegeeks.com/2015/01/separating-integration-tests-from-unit-tests-using-maven-failsafe-junit-category.html
+/**
+ * Provides a marker interface to designate Maven separation of unit/integration tests using JUnit's @Category annotation
+ */
 public interface IntegrationTest {
 
 }
