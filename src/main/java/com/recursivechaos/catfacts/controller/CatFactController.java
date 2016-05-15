@@ -81,9 +81,23 @@ public class CatFactController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteCatFact(@PathVariable("id") Long id) {
         catFactRepository.delete(id);
-        logger.info("cat fact deleted: " + id);
+        logger.info("cat fact deleted: {}", id);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/{id}/approve", method = RequestMethod.PUT)
+    public ResponseEntity approveCatFact(@PathVariable("id") Long id) {
+        CatFact catFact = catFactRepository.findOne(id);
+        logger.info("updating cat fact: {}", catFact);
+        if (null == catFact){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        catFact.setModerated(true);
+        catFactRepository.save(catFact);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
 
     private HttpHeaders createHeaders(CatFact catFact) {
         HttpHeaders httpHeaders = new HttpHeaders();
