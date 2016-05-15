@@ -77,6 +77,13 @@ public class CatFactController {
         return new ResponseEntity<>(catFactRepository.findByModeratedFalse(page), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteCatFact(@PathVariable("id") Long id) {
+        catFactRepository.delete(id);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
     private HttpHeaders createHeaders(CatFact catFact) {
         HttpHeaders httpHeaders = new HttpHeaders();
         // TODO: Extract external URI, or figure out how to assume
