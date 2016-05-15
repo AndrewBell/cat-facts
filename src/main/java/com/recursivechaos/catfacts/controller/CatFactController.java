@@ -81,6 +81,7 @@ public class CatFactController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteCatFact(@PathVariable("id") Long id) {
         catFactRepository.delete(id);
+        logger.info("cat fact deleted: " + id);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
