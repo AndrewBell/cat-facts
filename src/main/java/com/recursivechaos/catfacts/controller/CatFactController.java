@@ -11,6 +11,8 @@ import com.recursivechaos.catfacts.domain.CatFact;
 import com.recursivechaos.catfacts.repository.CatFactRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,8 +73,8 @@ public class CatFactController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping("/unmoderated")
-    public ResponseEntity<List<CatFact>> getUnmoderatedFacts() {
-        return new ResponseEntity<>(catFactRepository.findByModeratedFalse(), HttpStatus.OK);
+    public ResponseEntity<Page<CatFact>> getUnmoderatedFacts(Pageable page) {
+        return new ResponseEntity<>(catFactRepository.findByModeratedFalse(page), HttpStatus.OK);
     }
 
     private HttpHeaders createHeaders(CatFact catFact) {

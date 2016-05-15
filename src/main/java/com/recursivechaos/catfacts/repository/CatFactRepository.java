@@ -8,6 +8,8 @@
 package com.recursivechaos.catfacts.repository;
 
 import com.recursivechaos.catfacts.domain.CatFact;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +21,6 @@ public interface CatFactRepository extends PagingAndSortingRepository<CatFact, L
 
     List<CatFact> findByModeratedTrue();
 
-    List<CatFact> findByModeratedFalse();
+    Page<CatFact> findByModeratedFalse(Pageable pageable);
+
 }
